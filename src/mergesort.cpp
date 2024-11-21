@@ -3,32 +3,28 @@
 #include <random>
 #include <algorithm>
 
-#define VECTOR_SIZE 100
-#define LOW 1
-#define HIGH 100
+#define VECTOR_SIZE 1000000
+#define LOW 0
+#define HIGH 1000
 
 void mergesort(std::vector<int>& list, int l_index, int r_index);
 void print_vector(std::vector<int> &list);
 void merge(std::vector<int> &list, int l_index, int midpoint, int r_index);
-int gen();
+int gen(std::mt19937 engine);
 
 int main() {
-    
-    /* Crear arreglo de N elementos aleatorios*/
+
+     /* Crear arreglo de N elementos aleatorios*/
+    std::random_device seeder;
+    std::mt19937 engine {seeder()};
+    std::uniform_int_distribution get {LOW, HIGH};
     std::vector<int> unsorted_list (VECTOR_SIZE);
-    std::generate(unsorted_list.begin(), unsorted_list.end(), gen);
+    std::generate(unsorted_list.begin(), unsorted_list.end(), [&](){ return get(engine);});
 
     /* Ordenar la lista */
     std::cout << "Merge Sort" << std::endl;
     mergesort(unsorted_list, 0, unsorted_list.size() - 1);
     print_vector(unsorted_list);
-}
-
-int gen() {
-    std::random_device seeder;
-    std::mt19937 engine {seeder()};
-    std::uniform_int_distribution get {LOW, HIGH};
-    return get(engine);
 }
 
 void mergesort(std::vector<int>& list, int l_index, int r_index) {
