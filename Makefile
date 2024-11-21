@@ -3,8 +3,7 @@ CXXFLAGS= -Wall -fopenmp
 
 SRCDIR=src
 BUILDDIR=build
-TARGET=mergesort
-THREADS=4
+TARGET=analyzer
 
 bin/$(TARGET): $(BUILDDIR)/$(TARGET).o
 	$(CC) $(CXXFLAGS) -o bin/$(TARGET) $(BUILDDIR)/$(TARGET).o
@@ -17,10 +16,7 @@ object:
 	mkdir -p build
 
 run: bin/$(TARGET)
-	@echo "******MergeSort sin OMP******"
-	OMP_NUM_THREADS=1 ./bin/$(TARGET)
-	@echo "******MergeSort con OMP******"
-	OMP_NUM_THREADS=$(THREADS) ./bin/$(TARGET)
+	./bin/$(TARGET)
 
 .PHONY: clean
 clean: 
