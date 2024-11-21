@@ -2,6 +2,7 @@
 #include <vector>
 #include <random>
 #include <algorithm>
+#include <chrono>
 
 #define VECTOR_SIZE 10000000
 #define LOW 0
@@ -24,8 +25,14 @@ int main() {
 
     /* Ordenar la lista */
     std::cout << "Ordenando..." << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
     mergesort(unsorted_list, 0, unsorted_list.size() - 1);
-    std::cout << "Terminado" << std::endl;
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+    std::cout << "Tiempo: " << duration.count() << "ms\n";
+
+    return 0;
 }
 
 void mergesort(std::vector<int>& list, int l_index, int r_index) {
