@@ -5,9 +5,10 @@
 #include <chrono>
 #include <omp.h>
 
-#define VECTOR_SIZE 10000000
+#define VECTOR_SIZE 1'000'000
 #define LOW 0
-#define HIGH 100000
+#define HIGH 10000
+#define SEED 2287465853
 
 void mergesort(std::vector<int>& list, int l_index, int r_index);
 void print_vector(std::vector<int> &list);
@@ -17,15 +18,16 @@ int gen(std::mt19937 engine);
 int main() {
 
      /* Crear arreglo de N elementos aleatorios*/
-    std::cout << "Generando..." << std::endl;
-    std::random_device seeder;
-    std::mt19937 engine {seeder()};
+    std::cout << "Generando vector de numeros..." << std::endl;
+    //std::random_device seeder;
+    std::mt19937 engine {SEED};
     std::uniform_int_distribution get {LOW, HIGH};
     std::vector<int> unsorted_list (VECTOR_SIZE);
     std::generate(unsorted_list.begin(), unsorted_list.end(), [&](){ return get(engine);});
 
+
     /* Ordenar la lista */
-    std::cout << "Ordenando..." << std::endl;
+    std::cout << "Ordenando vector..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
 
     mergesort(unsorted_list, 0, unsorted_list.size() - 1);
