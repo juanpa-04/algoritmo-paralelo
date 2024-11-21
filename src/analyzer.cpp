@@ -95,14 +95,16 @@ public:
     // Método para análisis de rendimiento, imprime estadisticas 
     void performanceAnalysis() {
         // Tamaños de problema a probar
-        std::vector<int> problem_sizes = {100000, 500000, 1000000, 2000000, 5000000};
+        std::vector<int> problem_sizes = {1000000,2000000,3000000,4000000};
         
         // Número de hilos a probar
-        std::vector<int> thread_counts = {1, 2, 4, 8, 16};
+        std::vector<int> thread_counts = {1, 2, 3, 4};
 
         // Imprimir encabezado de resultados
         std::cout << "Performance Analysis for Merge Sort\n";
         std::cout << "Problem Size\tThreads\tTime (ms)\tSpeedup\n";
+
+        std::chrono::milliseconds::rep seq_duration;
 
         // Iterar sobre diferentes tamaños de problema
         for (int size : problem_sizes) {
@@ -115,29 +117,23 @@ public:
                 omp_set_num_threads(thread_count);
 
                 // Medición de tiempo secuencial
-                auto start_seq = std::chrono::high_resolution_clock::now();
+                auto start = std::chrono::high_resolution_clock::now();
                 {
                     std::vector<int> seq_list = test_list;
                     mergesort(seq_list, 0, seq_list.size() - 1);
                 }
-                auto end_seq = std::chrono::high_resolution_clock::now();
-                auto seq_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_seq - start_seq).count();
+                auto end = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-                // Medición de tiempo paralelo
-                auto start_par = std::chrono::high_resolution_clock::now();
-                {
-                    std::vector<int> par_list = test_list;
-                    mergesort(par_list, 0, par_list.size() - 1);
-                }
-                auto end_par = std::chrono::high_resolution_clock::now();
-                auto par_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_par - start_par).count();
+                if(thread_count == 1)
+                    seq_duration = duration;
 
                 // Calcular speedup (aceleración)
-                double speedup = static_cast<double>(seq_time) / par_time;
+                double speedup =static_cast<double> (seq_duration) / static_cast<double>(duration);
 
                 // Imprimir resultados
                 std::cout << size << "\t\t" << thread_count << "\t" 
-                          << par_time << "\t\t" << speedup << "\n";
+                          << duration << "\t\t" << speedup << "\n";
             }
             std::cout << "\n";
         }
