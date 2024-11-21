@@ -1,5 +1,5 @@
 CC= g++
-CXXFLAGS= -Wall -fopenmp -02
+CXXFLAGS= -Wall -fopenmp -O2
 
 SRCDIR=src
 BUILDDIR=build
