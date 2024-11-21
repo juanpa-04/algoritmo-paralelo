@@ -3,6 +3,7 @@
 #include <random>
 #include <algorithm>
 #include <chrono>
+#include <omp.h>
 
 #define VECTOR_SIZE 10000000
 #define LOW 0
@@ -26,11 +27,14 @@ int main() {
     /* Ordenar la lista */
     std::cout << "Ordenando..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
+
     mergesort(unsorted_list, 0, unsorted_list.size() - 1);
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
     std::cout << "Tiempo: " << duration.count() << "ms\n";
+    //print_vector(unsorted_list);
 
     return 0;
 }
@@ -43,13 +47,23 @@ void mergesort(std::vector<int>& list, int l_index, int r_index) {
     /* Dividir la list en dos*/
     int midpoint = l_index + (r_index - l_index) / 2;
 
-    /* Ordenar la mitad izquierda*/
-    mergesort(list, l_index, midpoint);
+    #pragma omp parallel 
+    {   
+        #pragma omp single 
+        {
+            /* Ordenar la mitad izquierda*/
+            #pragma omp task
+            mergesort(list, l_index, midpoint);
 
-    /* Ordenar la mitad derecha*/
-    mergesort(list, midpoint + 1, r_index);
-
+            /* Ordenar la mitad derecha*/
+            #pragma omp task
+            mergesort(list, midpoint + 1, r_index);
+        }
+       
+    }
+   
     /* Merge las dos listas*/
+    #pragma omp taskwait
     merge(list, l_index, midpoint, r_index);
 }
 
