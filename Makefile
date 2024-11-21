@@ -8,8 +8,11 @@ TARGET=mergesort
 bin/$(TARGET): $(BUILDDIR)/$(TARGET).o
 	$(CC) $(CPPFLAGS) -o bin/$(TARGET) $(BUILDDIR)/$(TARGET).o
 
-$(BUILDDIR)/$(TARGET).o: $(SRCDIR)/$(TARGET).cpp
+$(BUILDDIR)/$(TARGET).o: $(SRCDIR)/$(TARGET).cpp | object
 	$(CC) $(CPPFLAGS) -c $(SRCDIR)/$(TARGET).cpp -o $(BUILDDIR)/$(TARGET).o
+
+object:
+	mkdir -p bin
 
 run: bin/$(TARGET)
 	./bin/$(TARGET)
