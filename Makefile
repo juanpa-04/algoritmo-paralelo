@@ -6,8 +6,6 @@ BUILDDIR=build
 TARGET=mergesort
 THREADS=4
 
-all: bin/$(TARGET_OMP) bin/$(TARGET)
-
 bin/$(TARGET): $(BUILDDIR)/$(TARGET).o
 	$(CC) $(CXXFLAGS) -o bin/$(TARGET) $(BUILDDIR)/$(TARGET).o
 
@@ -16,6 +14,7 @@ $(BUILDDIR)/$(TARGET).o: $(SRCDIR)/$(TARGET).cpp | object
 
 object:
 	mkdir -p bin
+	mkdir -p build
 
 run: bin/$(TARGET)
 	@echo "******MergeSort sin OMP******"
