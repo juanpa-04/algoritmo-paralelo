@@ -18,10 +18,9 @@ private:
     // Método privado para realizar Merge Sort recursivo
     void mergesort(std::vector<int>& list, int l_index, int r_index) {
         // Condiciones de terminación para recursión
-        if (list.size() == 1) return;  // Lista de un solo elemento
-        if (r_index <= l_index) return;  // Sublista de un elemento
+        if (l_index >= r_index) return;  // Sublista de un elemento o inválida
 
-        // Calcular punto medio para dividir el arreglo, dividir la lista en dos
+        // Calcular punto medio para dividir el arreglo
         int midpoint = l_index + (r_index - l_index) / 2;
 
         // Región paralela de OpenMP
@@ -76,6 +75,11 @@ private:
         }
     }
 
+    // NUEVO MÉTODO: Calcular el porcentaje paralelizable para S = 1.2
+    double calculateParallelizablePercentage(double speedup_target, int threads) {
+        return (threads - speedup_target) / (threads * (speedup_target - 1));
+    }
+
 public:
     // Constructor que genera lista de números aleatorios
     MergeSortAnalyzer(int size) {
@@ -92,17 +96,17 @@ public:
         std::generate(original_list.begin(), original_list.end(), [&](){ return get(engine);});
     }
 
-    // Método para análisis de rendimiento, imprime estadisticas 
+    // Método para análisis de rendimiento, imprime estadísticas
     void performanceAnalysis() {
         // Tamaños de problema a probar
-        std::vector<int> problem_sizes = {1000000,2000000,3000000,4000000};
+        std::vector<int> problem_sizes = {1000000, 2000000, 3000000, 4000000};
         
         // Número de hilos a probar
         std::vector<int> thread_counts = {1, 2, 3, 4};
 
         // Imprimir encabezado de resultados
         std::cout << "Performance Analysis for Merge Sort\n";
-        std::cout << "Problem Size\tThreads\tTime (ms)\tSpeedup\n";
+        std::cout << "Problem Size\tThreads\tTime (ms)\tSpeedup\tCost (Op)\n";
 
         std::chrono::milliseconds::rep seq_duration;
 
@@ -125,15 +129,26 @@ public:
                 auto end = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-                if(thread_count == 1)
+                if (thread_count == 1) 
                     seq_duration = duration;
 
                 // Calcular speedup (aceleración)
-                double speedup =static_cast<double> (seq_duration) / static_cast<double>(duration);
+                double speedup = static_cast<double>(seq_duration) / static_cast<double>(duration);
 
-                // Imprimir resultados
+                // Calcular costo de paralelización (Op)
+                double ideal_time = static_cast<double>(seq_duration) / thread_count;
+                double parallelization_cost = duration - ideal_time;
+
+                // Imprimir resultados con costo (Op)
                 std::cout << size << "\t\t" << thread_count << "\t" 
-                          << duration << "\t\t" << speedup << "\n";
+                          << duration << "\t\t" << speedup << "\t" 
+                          << parallelization_cost << "\n";
+
+                // Verificar si el speedup cumple S > 1.2
+                if (speedup <= 1.2) {
+                    std::cout << "[INFO] Paralelismo no rentable para S <= 1.2. Ejecutando de forma secuencial.\n";
+                    omp_set_num_threads(1);  // Forzar modo secuencial
+                }
             }
             std::cout << "\n";
         }
